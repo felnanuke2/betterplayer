@@ -65,6 +65,10 @@ class BetterPlayerPlaylistController {
     _betterPlayerDataSourceList.addAll(dataSourceList);
     _setup();
   }
+  
+   void insertDataSource(BetterPlayerDataSource dataSource) {
+    _betterPlayerDataSourceList.add(dataSource);
+  }
 
   ///Handle video change signal from BetterPlayerController. Setup new data
   ///source based on configuration.
