@@ -1270,6 +1270,13 @@ class BetterPlayerController {
       BetterPlayerControlsConfiguration betterPlayerControlsConfiguration) {
     this._betterPlayerControlsConfiguration = betterPlayerControlsConfiguration;
   }
+  
+  
+  
+  void setBetterPlayerConfiguration(
+      BetterPlayerConfiguration betterPlayerControlsConfiguration) {
+    this.betterPlayerConfiguration = betterPlayerControlsConfiguration;
+  }
 
   /// Add controller internal event.
   void _postControllerEvent(BetterPlayerControllerEvent event) {
@@ -1277,6 +1284,8 @@ class BetterPlayerController {
       _controllerEventStreamController.add(event);
     }
   }
+  
+  
 
   ///Dispose BetterPlayerController. When [forceDispose] parameter is true, then
   ///autoDispose parameter will be overridden and controller will be disposed
