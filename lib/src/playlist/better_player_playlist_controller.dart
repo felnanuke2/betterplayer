@@ -66,8 +66,18 @@ class BetterPlayerPlaylistController {
     _setup();
   }
   
-   void insertDataSource(BetterPlayerDataSource dataSource) {
-    _betterPlayerDataSourceList.add(dataSource);
+   void insertDataSource(
+    BetterPlayerDataSource dataSource, {
+    int? index,
+  }) {
+    if (index == null) {
+      _betterPlayerDataSourceList.add(dataSource);
+    } else {
+      if (index > _dataSourceLength) index = _dataSourceLength;
+
+      _betterPlayerDataSourceList.insert(index, dataSource);
+      if (index! <= _currentDataSourceIndex) _currentDataSourceIndex++;
+    }
   }
 
   ///Handle video change signal from BetterPlayerController. Setup new data
