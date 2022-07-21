@@ -23,7 +23,7 @@ class BetterPlayerController {
   static const String _authorizationHeader = "Authorization";
 
   ///General configuration used in controller instance.
-  final BetterPlayerConfiguration betterPlayerConfiguration;
+ BetterPlayerConfiguration betterPlayerConfiguration;
 
   ///Playlist configuration used in controller instance.
   final BetterPlayerPlaylistConfiguration? betterPlayerPlaylistConfiguration;
@@ -1269,6 +1269,11 @@ class BetterPlayerController {
   void setBetterPlayerControlsConfiguration(
       BetterPlayerControlsConfiguration betterPlayerControlsConfiguration) {
     this._betterPlayerControlsConfiguration = betterPlayerControlsConfiguration;
+  }
+  
+    void setBetterPlayerConfiguration(
+      BetterPlayerConfiguration betterPlayerControlsConfiguration) {
+    this.betterPlayerConfiguration = betterPlayerControlsConfiguration;
   }
 
   /// Add controller internal event.
