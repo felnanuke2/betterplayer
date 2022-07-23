@@ -47,11 +47,15 @@ class BetterPlayerPlaylistController {
     }
 
     _currentDataSourceIndex = initialStartIndex;
+
     setupDataSource(_currentDataSourceIndex);
-    _betterPlayerController!.addEventsListener(_handleEvent);
+    _handleEventFunction ??= _handleEvent;
+    print(_betterPlayerController!.removeEventsListener(_handleEventFunction!));
+    _betterPlayerController!.addEventsListener(_handleEventFunction!);
+    _nextVideoTimeStreamSubscription?.cancel();
     _nextVideoTimeStreamSubscription =
         _betterPlayerController!.nextVideoTimeStream.listen((time) {
-      if (time != null && time == 0) {
+      if (time == 0) {
         _onVideoChange();
       }
     });
@@ -59,14 +63,26 @@ class BetterPlayerPlaylistController {
 
   /// Setup new data source list. Pauses currently played video and init new data
   /// source list. Previous data source list will be removed.
-  void setupDataSourceList(List<BetterPlayerDataSource> dataSourceList) {
-    _betterPlayerController?.pause();
-    _betterPlayerDataSourceList.clear();
-    _betterPlayerDataSourceList.addAll(dataSourceList);
-    _setup();
+  void setupDataSourceList(
+    List<BetterPlayerDataSource> dataSourceList, {
+    bool wantSetup = true,
+  }) {
+    if (wantSetup) {
+      _betterPlayerController?.pause();
+      _betterPlayerDataSourceList.clear();
+      _betterPlayerDataSourceList.addAll(dataSourceList);
+      _setup();
+    } else {
+      final currentItem = _betterPlayerDataSourceList[_currentDataSourceIndex];
+
+      _betterPlayerDataSourceList.clear();
+      _betterPlayerDataSourceList.addAll(dataSourceList);
+      _currentDataSourceIndex =
+          _betterPlayerDataSourceList.indexOf(currentItem);
+    }
   }
-  
-   void insertDataSource(
+
+  void insertDataSource(
     BetterPlayerDataSource dataSource, {
     int? index,
   }) {
@@ -76,7 +92,7 @@ class BetterPlayerPlaylistController {
       if (index > _dataSourceLength) index = _dataSourceLength;
 
       _betterPlayerDataSourceList.insert(index, dataSource);
-      if (index! <= _currentDataSourceIndex) _currentDataSourceIndex++;
+      if (index <= _currentDataSourceIndex) _currentDataSourceIndex++;
     }
   }
 
@@ -101,6 +117,7 @@ class BetterPlayerPlaylistController {
 
   ///Handle BetterPlayerEvent from BetterPlayerController. Used to control
   ///startup of next video timer.
+  Function(BetterPlayerEvent betterPlayerEvent)? _handleEventFunction;
   void _handleEvent(BetterPlayerEvent betterPlayerEvent) {
     if (betterPlayerEvent.betterPlayerEventType ==
         BetterPlayerEventType.finished) {
@@ -119,8 +136,15 @@ class BetterPlayerPlaylistController {
         "list - 1");
     if (index <= _dataSourceLength) {
       _currentDataSourceIndex = index;
-      _betterPlayerController!
-          .setupDataSource(_betterPlayerDataSourceList[index]);
+      final currentResolutionUrl = _betterPlayerDataSourceList[index]
+          .resolutions?[_betterPlayerController!.currentResolutionKey];
+      BetterPlayerDataSource dataSource = _betterPlayerDataSourceList[index];
+      if (currentResolutionUrl != null) {
+        dataSource = dataSource.copyWith(
+          url: currentResolutionUrl,
+        );
+      }
+      _betterPlayerController!.setupDataSource(dataSource);
     }
   }
 

@@ -23,7 +23,7 @@ class BetterPlayerController {
   static const String _authorizationHeader = "Authorization";
 
   ///General configuration used in controller instance.
- BetterPlayerConfiguration betterPlayerConfiguration;
+  BetterPlayerConfiguration betterPlayerConfiguration;
 
   ///Playlist configuration used in controller instance.
   final BetterPlayerPlaylistConfiguration? betterPlayerPlaylistConfiguration;
@@ -207,6 +207,19 @@ class BetterPlayerController {
   ///List of loaded ASMS segments
   final List<String> _asmsSegmentsLoaded = [];
 
+  String get currentResolutionKey {
+    String resolutionName = 'none';
+    for (final key
+        in (betterPlayerDataSource?.resolutions?.keys ?? <String>[])) {
+      final value = betterPlayerDataSource!.resolutions![key]!;
+      if (value == betterPlayerDataSource!.url) {
+        resolutionName = key;
+        break;
+      }
+    }
+    return resolutionName;
+  }
+
   ///Currently displayed [BetterPlayerSubtitle].
   BetterPlayerSubtitle? renderedSubtitle;
 
@@ -250,6 +263,7 @@ class BetterPlayerController {
               betterPlayerDataSource.bufferingConfiguration);
       videoPlayerController?.addListener(_onVideoPlayerChanged);
     }
+    final speed = videoPlayerController?.value.speed ?? 1.0;
 
     ///Clear asms tracks
     betterPlayerAsmsTracks.clear();
@@ -819,8 +833,8 @@ class BetterPlayerController {
 
   ///Remove event listener. This method should be called once you're disposing
   ///Better Player.
-  void removeEventsListener(Function(BetterPlayerEvent) eventListener) {
-    _eventListeners.remove(eventListener);
+  bool removeEventsListener(Function(BetterPlayerEvent) eventListener) {
+    return _eventListeners.remove(eventListener);
   }
 
   ///Flag which determines whenever player is playing live data source.
@@ -854,10 +868,12 @@ class BetterPlayerController {
 
       _nextVideoTime =
           betterPlayerPlaylistConfiguration!.nextVideoDelay.inSeconds;
-      _nextVideoTimeStreamController.add(_nextVideoTime);
+
       if (_nextVideoTime == 0) {
+        _nextVideoTimeStreamController.add(_nextVideoTime);
         return;
       }
+      _nextVideoTimeStreamController.add(_nextVideoTime);
 
       _nextVideoTimer =
           Timer.periodic(const Duration(milliseconds: 1000), (_timer) async {
@@ -868,6 +884,7 @@ class BetterPlayerController {
         if (_nextVideoTime != null) {
           _nextVideoTime = _nextVideoTime! - 1;
         }
+        print('startNextVideoTimer _nextVideoTime: $_nextVideoTime');
         _nextVideoTimeStreamController.add(_nextVideoTime);
       });
     }
@@ -875,9 +892,9 @@ class BetterPlayerController {
 
   ///Cancel next video timer. Used in playlist. Do not use manually.
   void cancelNextVideoTimer() {
+    _nextVideoTimer?.cancel();
     _nextVideoTime = null;
     _nextVideoTimeStreamController.add(_nextVideoTime);
-    _nextVideoTimer?.cancel();
     _nextVideoTimer = null;
   }
 
@@ -1270,8 +1287,8 @@ class BetterPlayerController {
       BetterPlayerControlsConfiguration betterPlayerControlsConfiguration) {
     this._betterPlayerControlsConfiguration = betterPlayerControlsConfiguration;
   }
-  
-    void setBetterPlayerConfiguration(
+
+  void setBetterPlayerConfiguration(
       BetterPlayerConfiguration betterPlayerControlsConfiguration) {
     this.betterPlayerConfiguration = betterPlayerControlsConfiguration;
   }
