@@ -49,7 +49,10 @@ class MockVideoPlayerController extends VideoPlayerController {
   }
 
   @override
-  Future<void> setSpeed(double speed) async {
+  Future<void> setSpeed(
+    double speed, {
+    void Function()? onError,
+  }) async {
     this.speed = speed;
   }
 

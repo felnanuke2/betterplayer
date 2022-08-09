@@ -700,7 +700,7 @@ class BetterPlayerController {
   }
 
   ///Set playback speed of video. Allows to set speed value between 0 and 2.
-  Future<void> setSpeed(double speed) async {
+  Future<void> setSpeed(double speed, {void Function()? onError}) async {
     if (speed <= 0 || speed > 2) {
       BetterPlayerUtils.log("Speed must be between 0 and 2");
       throw ArgumentError("Speed must be between 0 and 2");
@@ -709,7 +709,10 @@ class BetterPlayerController {
       BetterPlayerUtils.log("The data source has not been initialized");
       throw StateError("The data source has not been initialized");
     }
-    await videoPlayerController?.setSpeed(speed);
+    await videoPlayerController?.setSpeed(
+      speed,
+      onError: onError,
+    );
     _postEvent(
       BetterPlayerEvent(
         BetterPlayerEventType.setSpeed,
