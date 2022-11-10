@@ -87,26 +87,29 @@ AVPictureInPictureController *_pipController;
     [asset cancelLoading];
 }
 
+
 - (void) removeObservers{
-    if (self._observersAdded){
-        [_player removeObserver:self forKeyPath:@"rate" context:nil];
-        [[_player currentItem] removeObserver:self forKeyPath:@"status" context:statusContext];
-        [[_player currentItem] removeObserver:self forKeyPath:@"presentationSize" context:presentationSizeContext];
-        [[_player currentItem] removeObserver:self
-                                   forKeyPath:@"loadedTimeRanges"
-                                      context:timeRangeContext];
-        [[_player currentItem] removeObserver:self
-                                   forKeyPath:@"playbackLikelyToKeepUp"
-                                      context:playbackLikelyToKeepUpContext];
-        [[_player currentItem] removeObserver:self
-                                   forKeyPath:@"playbackBufferEmpty"
-                                      context:playbackBufferEmptyContext];
-        [[_player currentItem] removeObserver:self
-                                   forKeyPath:@"playbackBufferFull"
-                                      context:playbackBufferFullContext];
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
-        self._observersAdded = false;
-    }
+   
+//    if (self._observersAdded){
+//        [_player removeObserver:self forKeyPath:@"rate" context:nil];
+//        [[_player currentItem] removeObserver:self forKeyPath:@"status" context:statusContext];
+//        [[_player currentItem] removeObserver:self forKeyPath:@"presentationSize" context:presentationSizeContext];
+//        [[_player currentItem] removeObserver:self
+//                                   forKeyPath:@"loadedTimeRanges"
+//                                      context:timeRangeContext];
+//        [[_player currentItem] removeObserver:self
+//                                   forKeyPath:@"playbackLikelyToKeepUp"
+//                                      context:playbackLikelyToKeepUpContext];
+//        [[_player currentItem] removeObserver:self
+//                                   forKeyPath:@"playbackBufferEmpty"
+//                                      context:playbackBufferEmptyContext];
+//        [[_player currentItem] removeObserver:self
+//                                   forKeyPath:@"playbackBufferFull"
+//                                      context:playbackBufferFullContext];
+//        [[NSNotificationCenter defaultCenter] removeObserver:self];
+      
+//    }
+    self._observersAdded = false;
 }
 
 - (void)itemDidPlayToEndTime:(NSNotification*)notification {
@@ -236,7 +239,9 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
     _stalledCount = 0;
     _isStalledCheckStarted = false;
     _playerRate = 1;
-    [_player replaceCurrentItemWithPlayerItem:item];
+   [self.player pause];
+    self.player = nil;
+    self.player = [[AVPlayer alloc] initWithPlayerItem:item];
 
     AVAsset* asset = [item asset];
     void (^assetCompletionHandler)(void) = ^{
